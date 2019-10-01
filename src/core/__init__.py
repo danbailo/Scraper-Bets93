@@ -1,0 +1,1 @@
+from .MySQLcompatible import MySQLcompatible
