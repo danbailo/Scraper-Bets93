@@ -28,7 +28,7 @@ class MySQLcompatible:
 
     def __enter__(self):
         self.cursor = self.connect.cursor()
-        return self.cursor
+        return self.connect,self.cursor
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.cursor.close()
