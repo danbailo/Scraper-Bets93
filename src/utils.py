@@ -26,37 +26,34 @@ def create_database(cursor, database_name):
     except Exception as err:
         pass
 
-def create_table(cursor, tabelas, table_name):
+def create_table(db, cursor, tabelas):
 	for table_name in tabelas:
 		table_description = tabelas[table_name]
-		try:
-			print("Creating table {}: ".format(table_name), end='')
-			cursor.execute(table_description)
-		except mysql.connector.Error as err:
-			pass
+		print("Creating table {} ".format(table_name))
+		cursor.execute(table_description)
+	# cursor.close()
+	# db.close()
 
 def insert_into_campeonato(db, cursor, dados_campeonato):
 	add_campeonato = ("INSERT IGNORE INTO campeonato "
 	"(idjogo, nome_campeonato, partida, data_hora) "
 	"VALUES (%(idjogo)s, %(nome_campeonato)s, %(partida)s, %(data_hora)s)")
-
-	# # Insert salary information
-	# data_salary = {
-	# 'idjogo': emp_no,
-	# 'nome_campeonato': 50000,
-	# 'partida': tomorrow,
-	# 'to_ddata_horaate': date(9999, 1, 1),
-	# }
-	try:
-		cursor.execute(add_campeonato, dados_campeonato)
-		print("Campeonato inserido com sucesso!")
-	except Exception as err:
-		print(err)	
+	cursor.execute(add_campeonato, dados_campeonato)
+	print("Campeonato inserido com sucesso!")
 	db.commit()	
 	# cursor.close()
 	# db.close()
 
-
+def insert_into_jogos(db, cursor, dados_jogos):
+	print(dados_jogos)
+	add_campeonato = ("INSERT IGNORE INTO jogos "
+	"(id_jogo, dados, valor) "
+	"VALUES (%(idjogo)s, %(dados)s, %(valor)s)")
+	cursor.execute(add_campeonato, dados_jogos)
+	print("Jogos inserido com sucesso!")
+	db.commit()	
+	# cursor.close()
+	# db.close()
 
 def drop_database(cursor, database_name):
     try:
