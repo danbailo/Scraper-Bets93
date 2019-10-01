@@ -39,18 +39,17 @@ def insert_into_campeonato(db, cursor, dados_campeonato):
 	"(idjogo, nome_campeonato, partida, data_hora) "
 	"VALUES (%(idjogo)s, %(nome_campeonato)s, %(partida)s, %(data_hora)s)")
 	cursor.execute(add_campeonato, dados_campeonato)
-	print("Campeonato inserido com sucesso!")
+	# print("Campeonato inserido com sucesso!")
 	db.commit()	
 	# cursor.close()
 	# db.close()
 
 def insert_into_jogos(db, cursor, dados_jogos):
-	print(dados_jogos)
 	add_campeonato = ("INSERT IGNORE INTO jogos "
 	"(id_jogo, dados, valor) "
 	"VALUES (%(idjogo)s, %(dados)s, %(valor)s)")
 	cursor.execute(add_campeonato, dados_jogos)
-	print("Jogos inserido com sucesso!")
+	# print("Jogos inserido com sucesso!")
 	db.commit()	
 	# cursor.close()
 	# db.close()
