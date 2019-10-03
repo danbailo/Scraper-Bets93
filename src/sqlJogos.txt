@@ -1,0 +1,58 @@
+﻿tabela 1 - jogos_uni (onde vc colocou campeonato)
+
+CREATE TABLE `jogos_uni` (
+  `id` int(11) NOT NULL,
+  `titulo` varchar(250) NOT NULL,
+  `data` datetime NOT NULL,
+  `slugLiga` varchar(120) DEFAULT NULL,
+  `pais` varchar(100) DEFAULT NULL,
+  `liga` varchar(100) DEFAULT NULL,
+  `status` int(11) NOT NULL,
+  `posicao` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
+EXPLICAÇÃO
+
+id-> id do jogo
+titulo-> time1 x time2 (onde vc colocou partida)
+data -> data/hora 
+slugLiga-> é o vc colocou nome_campeonato dessa forma (inglaterra-partidas-reservas)sem espaço e sem acento tudo minusculo.Tipo uma url amigavel
+pais-> é o pais (a primeira parte do nome_campeonato)
+liga -> é o campeonato (é a segunda parte do nome_campeonato) 
+status-> valor fixo 1
+posicao-> valor fixo 1 
+
+=================================
+
+tabela 2 - modal_uni (onde vc colocou jogos)
+
+CREATE TABLE `modal_uni` (
+  `id` int(11) NOT NULL,
+  `jogo_id` int(11) NOT NULL,
+  `odd_id` int(11) NOT NULL,
+  `cat_id` int(11) NOT NULL,
+  `categoria` varchar(250) NOT NULL,
+  `propriedade` varchar(250) NOT NULL,
+  `valor` decimal(8,2) NOT NULL DEFAULT '0.00',
+  `status` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
+EXPLICAÇÃO
+
+id-> auto increment
+jogo_id-> id do jogo
+odd_id -> id da odd
+cat_id-> valor fixo 1
+categoria -> [tipoModalidae] 
+propriedade -> [modalidade]
+valor->[odd]
+id_modal->valor fixo 1
+status -> valor fixo 1
+
+
+
+ 
+
+
