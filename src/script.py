@@ -70,7 +70,7 @@ with MySQLcompatible("daniel", "123456789") as database:
 	utils.create_table(cursor, tabelas)
 	utils.truncate_table(cursor, tabelas)
 
-	for jogo in jogos:
+	for jogo in jogos:		
 		attr = jogo.get("id")
 		if pattern_campeonato.match(attr):
 			NOME_CAMP = jogo.find(class_="camp").text
@@ -93,15 +93,21 @@ with MySQLcompatible("daniel", "123456789") as database:
 			minutos = int(data_hora.split()[-1].split(':')[1])
 			data_hora = str(datetime.datetime(ano,mes,dia,horas,minutos))
 
-			utils.insert_into_jogos_uni(db, cursor, {
+			dados_jogos_uni = {
 				'id_jogo':id_jogo, 'titulo': titulo, 'data_hora': data_hora, 'slugLiga': slugLiga,
 				'pais':pais, 'liga': liga, 'status': status, 'posicao': posicao
-			})            
+			}
+			utils.insert_into_jogos_uni(db, cursor, dados_jogos_uni)            
 			print("Dados inseridos na tabela 'jogos_uni'")
 
 			params = (('id_jogo', id_jogo),)
-			response = requests.get('https://bets93.net/api.php', headers=headers, params=params)
-			json_response = response.json()
+			while True:
+				try:
+					response = requests.get('https://bets93.net/api.php', headers=headers, params=params)
+					json_response = response.json()
+					break
+				except Exception as err:
+					pass
 			response.close()
 
 			valores = []  
@@ -127,9 +133,11 @@ with MySQLcompatible("daniel", "123456789") as database:
 				try:
 					browser.find_element_by_id(botao).click()
 					break
-				except Exception as err: 
-					browser.find_element_by_class_name("btn.btn-danger").click()
-			time.sleep(3)
+				except Exception: 
+					browser.find_element_by_class_name("btn.btn-danger").click()			
+
+			# passa o tempo pela linha de comando
+			# time.sleep(1) #sincroniza os dados
 			soup = BeautifulSoup(browser.page_source, "html.parser")
 			modal = soup.find(id="modal")
 
@@ -146,9 +154,16 @@ with MySQLcompatible("daniel", "123456789") as database:
 			#erro de key eh aqui
 			#fazer o try no laco antes de inserir no banco, 
 			# se nao der erro coloca uma variavel e dps armazena no banco
-			for i in range(len(categoria)):
-				utils.insert_into_modal_uni(db, cursor, {                    
-					'jogo_id': id_jogo, 'odd_id':odd_id[i], 'cat_id':categoria[i], 'categoria':dict_categorias[categoria[i]],
-					'id_modal':propriedade[i],'propriedade':dict_propriedades[propriedade[i]], 'valor':valor[i],'status':status
-				})
+			while True:
+				try:
+					for i in range(len(categoria)):
+						dados_modal_uni = { 
+							'jogo_id': id_jogo, 'odd_id':odd_id[i], 'cat_id':categoria[i], 'categoria':dict_categorias[categoria[i]],
+							'id_modal':propriedade[i],'propriedade':dict_propriedades[propriedade[i]], 'valor':valor[i],'status':status
+						}
+					break
+				except Exception as err:
+					print(f'ERRO, AUMENTE O VALOR DO TEMPO {err}')
+					exit()
+			utils.insert_into_modal_uni(db, cursor, dados_modal_uni)
 			print("Dados inseridos na tabela 'modal_uni'\n")
