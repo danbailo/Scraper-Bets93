@@ -21,10 +21,11 @@ def connect_database(cursor, database_name):
 		print('ERROR!: {}'.format(err))        
 
 def create_database(cursor, database_name):
-    try:
-        cursor.execute("CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(database_name))
-    except Exception as err:
-        pass
+	try:
+		cursor.execute(f"CREATE DATABASE {database_name} IF NOT EXISTS")
+		cursor.execute(f"USE {database_name}")
+	except Exception as err:
+		pass
 
 def create_table(db, cursor, tabelas):
 	for table_name in tabelas:
