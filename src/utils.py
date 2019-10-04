@@ -21,8 +21,8 @@ def insert_into_jogos_uni(db, cursor, jogos_uni):
 def insert_into_modal_uni(db, cursor, modal_uni):
 	add_modal_uni = (
 		"INSERT IGNORE INTO modal_uni "
-		"(jogo_id, odd_id, cat_id, categoria, propriedade, valor, status) "
-		"VALUES (%(jogo_id)s, %(odd_id)s, %(cat_id)s, %(categoria)s, %(propriedade)s, %(valor)s, %(status)s)"
+		"(jogo_id, odd_id, cat_id, categoria, id_modal, propriedade, valor, status) "
+		"VALUES (%(jogo_id)s, %(odd_id)s, %(cat_id)s, %(categoria)s, %(id_modal)s, %(propriedade)s, %(valor)s, %(status)s)"
 		)
 	cursor.execute(add_modal_uni, modal_uni)
 	db.commit()	
