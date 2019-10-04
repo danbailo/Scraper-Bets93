@@ -5,9 +5,13 @@ def create_database(cursor, database_name):
 	cursor.execute(f"CREATE DATABASE IF NOT EXISTS {database_name}")
 	cursor.execute(f"USE {database_name}")
 
-def create_table(db, cursor, tabelas):
+def create_table(cursor, tabelas):
 	for nome_tabela in tabelas:
 		cursor.execute(tabelas[nome_tabela])
+
+def truncate_table(cursor, tabelas):
+	cursor.execute("TRUNCATE TABLE jogos_uni")
+	cursor.execute("TRUNCATE TABLE modal_uni")
 
 def insert_into_jogos_uni(db, cursor, jogos_uni):
 	add_jogos_uni = (
