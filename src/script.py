@@ -6,6 +6,7 @@ import re
 import datetime
 import time
 import utils
+import json
 
 headers = {
 	'sec-fetch-mode': 'cors',
@@ -126,25 +127,33 @@ with MySQLcompatible("daniel", "123456789") as database:
 				odd_id.append(int(id_odd))
 				valor.append(float(odd))
 
-			status = 1
-
 			botao = "jogo_"+str(id_jogo)+"_outros"
+
 			while True:
 				try:
-					browser.find_element_by_id(botao).click()
-					break
-				except Exception: 
-					browser.find_element_by_class_name("btn.btn-danger").click()			
-			time.sleep(1)
+					browser.find_element_by_id(botao).click()	
+					break	
+				except:
+					browser.find_element_by_class_name("btn.btn-danger").click()
+
+			# time.sleep(1)#na minha opniao, e o tempo de carregar a pagina, pq o modal tem dados, mas se o camps esta vazio, é pq ele nao achou nada pois a pagina nao carregou!
+			#time sleep e o tempo pro selenium carregar o website
+
 			soup = BeautifulSoup(browser.page_source, "html.parser")
 			modal = soup.find(id="modal")
-
 			camps = modal.findAll(class_="camp")
+			props = modal.findAll(class_="col-9 col-sm-9",recursive=True)
+
+			while (len(set(categoria)) != len(camps)) or (len(propriedade) != len(props)):
+				soup = BeautifulSoup(browser.page_source, "html.parser")
+				modal = soup.find(id="modal")				
+				camps = modal.findAll(class_="camp")
+				props = modal.findAll(class_="col-9 col-sm-9",recursive=True)
+
 			for i in range(len(camps)):
 				camps[i] = camps[i].text
 			dict_categorias = dict(zip(set(categoria),camps))
-
-			props = modal.findAll(class_="col-9 col-sm-9",recursive=True)
+			
 			for i in range(len(props)):
 				props[i] = props[i].text
 			dict_propriedades = dict(zip(propriedade,props))
@@ -158,7 +167,7 @@ with MySQLcompatible("daniel", "123456789") as database:
 					'id_modal':propriedade[i],
 					'propriedade':dict_propriedades[propriedade[i]], 
 					'valor':valor[i],
-					'status':status
+					'status':1
 				}
 				utils.insert_into_modal_uni(db, cursor, dados_modal_uni)		
-			print("Dados inseridos na tabela 'modal_uni'\n")
+			print("Dados inseridos na tabela 'modal_uni'\n")			
