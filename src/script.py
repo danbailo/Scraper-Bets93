@@ -135,9 +135,7 @@ with MySQLcompatible("daniel", "123456789") as database:
 					break
 				except Exception: 
 					browser.find_element_by_class_name("btn.btn-danger").click()			
-
-			# passa o tempo pela linha de comando
-			# time.sleep(1) #sincroniza os dados
+			time.sleep(1)
 			soup = BeautifulSoup(browser.page_source, "html.parser")
 			modal = soup.find(id="modal")
 
@@ -151,19 +149,16 @@ with MySQLcompatible("daniel", "123456789") as database:
 				props[i] = props[i].text
 			dict_propriedades = dict(zip(propriedade,props))
 
-			#erro de key eh aqui
-			#fazer o try no laco antes de inserir no banco, 
-			# se nao der erro coloca uma variavel e dps armazena no banco
-			while True:
-				try:
-					for i in range(len(categoria)):
-						dados_modal_uni = { 
-							'jogo_id': id_jogo, 'odd_id':odd_id[i], 'cat_id':categoria[i], 'categoria':dict_categorias[categoria[i]],
-							'id_modal':propriedade[i],'propriedade':dict_propriedades[propriedade[i]], 'valor':valor[i],'status':status
-						}
-					break
-				except Exception as err:
-					print(f'ERRO, AUMENTE O VALOR DO TEMPO {err}')
-					exit()
-			utils.insert_into_modal_uni(db, cursor, dados_modal_uni)
+			for i in range(len(categoria)):
+				dados_modal_uni = { 
+					'jogo_id': id_jogo,
+					'odd_id':odd_id[i], 
+					'cat_id':categoria[i], 
+					'categoria':dict_categorias[categoria[i]],
+					'id_modal':propriedade[i],
+					'propriedade':dict_propriedades[propriedade[i]], 
+					'valor':valor[i],
+					'status':status
+				}
+				utils.insert_into_modal_uni(db, cursor, dados_modal_uni)		
 			print("Dados inseridos na tabela 'modal_uni'\n")
