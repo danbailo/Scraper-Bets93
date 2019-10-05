@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
+from time import time
 from core import MySQL
 import requests
 import re
@@ -51,8 +52,6 @@ with MySQL("daniel", "123456789") as database:
 			pais = NOME_CAMP.split()[0]
 			liga = NOME_CAMP.split()[1:]
 			liga = ' '.join(liga)
-			status = 1
-			posicao = 1
 		elif pattern_jogo.match(attr):
 			id_jogo = int(attr.split('_')[-1])
 			titulo = jogo.find(class_="times fundojogos").text.split()[:-3]
@@ -72,24 +71,25 @@ with MySQL("daniel", "123456789") as database:
 				'slugLiga': slugLiga,
 				'pais':pais, 
 				'liga': liga, 
-				'status': status, 
-				'posicao': posicao
+				'status': 1, 
+				'posicao': 1
 			}
 			utils.insert_into_jogos_uni(db, cursor, dados_jogos_uni)            
-			print("Dados inseridos na tabela 'jogos_uni'")
+			# print("Dados inseridos na tabela 'jogos_uni'")
 
 			params = (('id_jogo', str(id_jogo)),)
-			cont = -1
+			
+			stop = 0
 			while True:
-				cont += 1
-				try:
-					response = requests.get('https://bets93.net/api.php', headers=headers, params=params)
+				start = time()
+				response = requests.get('https://bets93.net/api.php', headers=headers, params=params)
+				if response.ok: 
 					json_response = response.json()
 					break
-				except Exception: 
-					if cont == 10: 
-						print("\nErro ao fazer as requisições, por favor, execute o programa novamente!\n")
-						exit(-1)
+				elif stop > 15:
+					assert("\nErro ao fazer as requisições, por favor, execute o programa novamente!\n")
+					exit(-1)
+				else: stop+=1
 			response.close()
 
 			valores = []  
@@ -138,7 +138,9 @@ with MySQL("daniel", "123456789") as database:
 					'status':1
 				}
 				utils.insert_into_modal_uni(db, cursor, dados_modal_uni)		
-			print("Dados inseridos na tabela 'modal_uni'\n")
+			# print("Dados inseridos na tabela 'modal_uni'\n")
+			print(f'Partida "{titulo}" inserida no banco de dados com sucesso!')
+			print(f"ID:{id_jogo}\n")
 			try: WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "btn.btn-danger"))).click()
 			except Exception: pass
 	print("Todos os dados foram inseridos com sucesso!")
