@@ -10,19 +10,6 @@ import re
 import datetime
 import utils
 
-headers = {
-	'sec-fetch-mode': 'cors',
-	'cookie': '__cfduid=d286a6b04f21dc52264db8885f48b8f971570143846',
-	'accept-encoding': 'gzip, deflate, br',
-	'accept-language': 'en,en-US;q=0.9,pt-BR;q=0.8,pt;q=0.7',
-	'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36',
-	'accept': 'application/json, text/javascript, */*; q=0.01',
-	'referer': 'https://bets93.net/',
-	'authority': 'bets93.net',
-	'x-requested-with': 'XMLHttpRequest',
-	'sec-fetch-site': 'same-origin',
-}	
-
 options = webdriver.ChromeOptions()
 options.add_argument('headless')
 driver = webdriver.Chrome(options=options)
@@ -36,7 +23,7 @@ soup = BeautifulSoup(driver.page_source, "html.parser")
 tabela_jogos = soup.find(class_="jogos")
 jogos = tabela_jogos.findAll("div",recursive=False)
 
-with MySQL("daniel", "123456789") as database:
+with MySQL("root", "") as database:
 	db = database[0]
 	cursor = database[1]
 	utils.create_database(cursor, "bets93")
@@ -74,16 +61,11 @@ with MySQL("daniel", "123456789") as database:
 				'status': 1, 
 				'posicao': 1
 			}
-			utils.insert_into_jogos_uni(db, cursor, dados_jogos_uni)            
-			# print("Dados inseridos na tabela 'jogos_uni'")
-
-			params = (('id_jogo', str(id_jogo)),)
-			
+			utils.insert_into_jogos_uni(db, cursor, dados_jogos_uni)            		
 			stop = 0
 			while True:
-				start = time()
-				response = requests.get('https://bets93.net/api.php', headers=headers, params=params)
-				if response.ok: 
+				response = requests.get("https://bets93.net/api.php?id_jogo="+str(id_jogo))
+				if response.status_code == 200: 
 					json_response = response.json()
 					break
 				elif stop > 15:
@@ -138,7 +120,6 @@ with MySQL("daniel", "123456789") as database:
 					'status':1
 				}
 				utils.insert_into_modal_uni(db, cursor, dados_modal_uni)		
-			# print("Dados inseridos na tabela 'modal_uni'\n")
 			print(f'Partida "{titulo}" inserida no banco de dados com sucesso!')
 			print(f"ID:{id_jogo}\n")
 			try: WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "btn.btn-danger"))).click()
