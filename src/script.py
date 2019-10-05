@@ -21,36 +21,6 @@ headers = {
 	'sec-fetch-site': 'same-origin',
 }	
 
-tabelas = {}
-
-tabelas['jogos_uni'] = (
-"CREATE TABLE IF NOT EXISTS `jogos_uni` ("
-"  `id` int(11) NOT NULL,"
-"  `titulo` varchar(250) NOT NULL,"
-"  `data` datetime NOT NULL,"
-"  `slugLiga` varchar(120) DEFAULT NULL,"
-"  `pais` varchar(100) DEFAULT NULL,"
-"  `liga` varchar(100) DEFAULT NULL,"
-"  `status` int(11) NOT NULL,"
-"  `posicao` int(11) NOT NULL,"
-"   PRIMARY KEY(`id`)"    
-") ENGINE=MyISAM DEFAULT CHARSET=latin1;")
-
-tabelas['modal_uni'] = (
-"CREATE TABLE IF NOT EXISTS `modal_uni` ("
-"  `id` int(11) NOT NULL AUTO_INCREMENT,"
-"  `jogo_id` int(11) NOT NULL,"
-"  `odd_id` int(11) NOT NULL,"
-"  `cat_id` int(11) NOT NULL,"
-"  `categoria` varchar(250) NOT NULL,"
-"  `id_modal` int(11) NOT NULL,"    
-"  `propriedade` varchar(250) NOT NULL,"
-"  `valor` decimal(8,2) NOT NULL DEFAULT '0.00',"
-"  `status` int(11) NOT NULL,"
-"   PRIMARY KEY (`id`)"    
-") ENGINE=MyISAM DEFAULT CHARSET=latin1;")
-
-
 options = webdriver.ChromeOptions()
 options.add_argument('headless')
 browser = webdriver.Chrome(options=options)
@@ -68,8 +38,8 @@ with MySQLcompatible("daniel", "123456789") as database:
 	db = database[0]
 	cursor = database[1]
 	utils.create_database(cursor, "bets93")
-	utils.create_table(cursor, tabelas)
-	utils.truncate_table(cursor, tabelas)
+	utils.create_table(cursor)
+	utils.truncate_table(cursor)
 
 	for jogo in jogos:		
 		attr = jogo.get("id")
@@ -95,20 +65,29 @@ with MySQLcompatible("daniel", "123456789") as database:
 			data_hora = str(datetime.datetime(ano,mes,dia,horas,minutos))
 
 			dados_jogos_uni = {
-				'id_jogo':id_jogo, 'titulo': titulo, 'data_hora': data_hora, 'slugLiga': slugLiga,
-				'pais':pais, 'liga': liga, 'status': status, 'posicao': posicao
+				'id_jogo':id_jogo, 
+				'titulo': titulo, 
+				'data_hora': data_hora, 
+				'slugLiga': slugLiga,
+				'pais':pais, 
+				'liga': liga, 
+				'status': status, 
+				'posicao': posicao
 			}
 			utils.insert_into_jogos_uni(db, cursor, dados_jogos_uni)            
 			print("Dados inseridos na tabela 'jogos_uni'")
 
-			params = (('id_jogo', id_jogo),)
+			params = (('id_jogo', str(id_jogo)),)
+
+			cont = -1
 			while True:
+				cont += 1
 				try:
 					response = requests.get('https://bets93.net/api.php', headers=headers, params=params)
 					json_response = response.json()
 					break
-				except Exception as err:
-					pass
+				except Exception: 
+					if cont == 10: exit(-1)
 			response.close()
 
 			valores = []  
@@ -131,14 +110,13 @@ with MySQLcompatible("daniel", "123456789") as database:
 
 			while True:
 				try:
-					browser.find_element_by_id(botao).click()	
+					browser.find_element_by_id(botao).click()
+					time.sleep(3)
 					break	
-				except:
+				except Exception: 
 					browser.find_element_by_class_name("btn.btn-danger").click()
-
-			# time.sleep(1)#na minha opniao, e o tempo de carregar a pagina, pq o modal tem dados, mas se o camps esta vazio, é pq ele nao achou nada pois a pagina nao carregou!
-			#time sleep e o tempo pro selenium carregar o website
-
+					time.sleep(3)
+			# time.sleep(5)
 			soup = BeautifulSoup(browser.page_source, "html.parser")
 			modal = soup.find(id="modal")
 			camps = modal.findAll(class_="camp")
@@ -150,12 +128,9 @@ with MySQLcompatible("daniel", "123456789") as database:
 				camps = modal.findAll(class_="camp")
 				props = modal.findAll(class_="col-9 col-sm-9",recursive=True)
 
-			for i in range(len(camps)):
-				camps[i] = camps[i].text
+			for i in range(len(camps)): camps[i] = camps[i].text
 			dict_categorias = dict(zip(set(categoria),camps))
-			
-			for i in range(len(props)):
-				props[i] = props[i].text
+			for i in range(len(props)): props[i] = props[i].text
 			dict_propriedades = dict(zip(propriedade,props))
 
 			for i in range(len(categoria)):
@@ -170,4 +145,8 @@ with MySQLcompatible("daniel", "123456789") as database:
 					'status':1
 				}
 				utils.insert_into_modal_uni(db, cursor, dados_modal_uni)		
-			print("Dados inseridos na tabela 'modal_uni'\n")			
+			print("Dados inseridos na tabela 'modal_uni'\n")
+			try: 
+				browser.find_element_by_class_name("btn.btn-danger").click()
+				time.sleep(3)
+			except Exception: pass
