@@ -23,7 +23,7 @@ soup = BeautifulSoup(driver.page_source, "html.parser")
 tabela_jogos = soup.find(class_="jogos")
 jogos = tabela_jogos.findAll("div",recursive=False)
 
-with MySQL("root", "") as database:
+with MySQL("daniel", "123456789") as database:
 	db = database[0]
 	cursor = database[1]
 	utils.create_database(cursor, "bets93")
