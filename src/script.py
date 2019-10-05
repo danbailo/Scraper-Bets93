@@ -1,4 +1,7 @@
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from core import MySQLcompatible
 from bs4 import BeautifulSoup
 import requests
@@ -26,6 +29,7 @@ options.add_argument('headless')
 browser = webdriver.Chrome(options=options)
 browser.get("https://bets93.net/")
 browser.find_element_by_xpath("//div[@class='lateral']/div/ul").click()
+time.sleep(1)
 
 pattern_campeonato = re.compile(r"c_visivel")
 pattern_jogo = re.compile(r"j_visivel_")
@@ -111,11 +115,11 @@ with MySQLcompatible("daniel", "123456789") as database:
 			while True:
 				try:
 					browser.find_element_by_id(botao).click()
-					time.sleep(3)
+					time.sleep(1)
 					break	
 				except Exception: 
 					browser.find_element_by_class_name("btn.btn-danger").click()
-					time.sleep(3)
+					time.sleep(1)
 			# time.sleep(5)
 			soup = BeautifulSoup(browser.page_source, "html.parser")
 			modal = soup.find(id="modal")
@@ -148,5 +152,5 @@ with MySQLcompatible("daniel", "123456789") as database:
 			print("Dados inseridos na tabela 'modal_uni'\n")
 			try: 
 				browser.find_element_by_class_name("btn.btn-danger").click()
-				time.sleep(3)
+				time.sleep(1)
 			except Exception: pass
