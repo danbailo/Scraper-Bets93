@@ -1,15 +1,44 @@
 import mysql.connector
 from mysql.connector import errorcode
 
+tabelas = {}
+
+tabelas['jogos_uni'] = (
+"CREATE TABLE IF NOT EXISTS `jogos_uni` ("
+"  `id` int(11) NOT NULL,"
+"  `titulo` varchar(250) NOT NULL,"
+"  `data` datetime NOT NULL,"
+"  `slugLiga` varchar(120) DEFAULT NULL,"
+"  `pais` varchar(100) DEFAULT NULL,"
+"  `liga` varchar(100) DEFAULT NULL,"
+"  `status` int(11) NOT NULL,"
+"  `posicao` int(11) NOT NULL,"
+"   PRIMARY KEY(`id`)"    
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;")
+
+tabelas['modal_uni'] = (
+"CREATE TABLE IF NOT EXISTS `modal_uni` ("
+"  `id` int(11) NOT NULL AUTO_INCREMENT,"
+"  `jogo_id` int(11) NOT NULL,"
+"  `odd_id` int(11) NOT NULL,"
+"  `cat_id` int(11) NOT NULL,"
+"  `categoria` varchar(250) NOT NULL,"
+"  `id_modal` int(11) NOT NULL,"    
+"  `propriedade` varchar(250) NOT NULL,"
+"  `valor` decimal(8,2) NOT NULL DEFAULT '0.00',"
+"  `status` int(11) NOT NULL,"
+"   PRIMARY KEY (`id`)"    
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;")
+
 def create_database(cursor, database_name):
 	cursor.execute(f"CREATE DATABASE IF NOT EXISTS {database_name}")
 	cursor.execute(f"USE {database_name}")
 
-def create_table(cursor, tabelas):
+def create_table(cursor):
 	for nome_tabela in tabelas:
 		cursor.execute(tabelas[nome_tabela])
 
-def truncate_table(cursor, tabelas):
+def truncate_table(cursor):
 	cursor.execute("TRUNCATE TABLE jogos_uni")
 	cursor.execute("TRUNCATE TABLE modal_uni")
 

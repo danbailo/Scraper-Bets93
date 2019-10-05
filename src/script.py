@@ -82,7 +82,6 @@ with MySQLcompatible("daniel", "123456789") as database:
 			print("Dados inseridos na tabela 'jogos_uni'")
 
 			params = (('id_jogo', str(id_jogo)),)
-
 			cont = -1
 			while True:
 				cont += 1
@@ -91,19 +90,20 @@ with MySQLcompatible("daniel", "123456789") as database:
 					json_response = response.json()
 					break
 				except Exception: 
-					if cont == 10: exit(-1)
+					if cont == 10: 
+						print("\nErro ao fazer as requisições, por favor, execute o programa novamente!\n")
+						exit(-1)
 			response.close()
 
 			valores = []  
 			for dicionario in json_response:
 				valores.append((dicionario['id_tipo_modalidade'], dicionario['id_modalidade'], dicionario['id_odd'], dicionario['odd']))        
 			valores = sorted(valores, key=lambda x:int(x[0])/1)
-
+			
 			categoria = []        
 			propriedade = []
 			odd_id = []
 			valor = []
-
 			for id_tipo_modalidade, id_modalidade, id_odd, odd in valores:
 				categoria.append(int(id_tipo_modalidade))
 				propriedade.append(int(id_modalidade))
@@ -111,21 +111,13 @@ with MySQLcompatible("daniel", "123456789") as database:
 				valor.append(float(odd))
 
 			botao = "jogo_"+str(id_jogo)+"_outros"
+			try: WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.ID, botao))).click()
+			except Exception: WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "btn.btn-danger"))).click()
 
-			while True:
-				try:
-					browser.find_element_by_id(botao).click()
-					time.sleep(1)
-					break	
-				except Exception: 
-					browser.find_element_by_class_name("btn.btn-danger").click()
-					time.sleep(1)
-			# time.sleep(5)
 			soup = BeautifulSoup(browser.page_source, "html.parser")
 			modal = soup.find(id="modal")
 			camps = modal.findAll(class_="camp")
 			props = modal.findAll(class_="col-9 col-sm-9",recursive=True)
-
 			while (len(set(categoria)) != len(camps)) or (len(propriedade) != len(props)):
 				soup = BeautifulSoup(browser.page_source, "html.parser")
 				modal = soup.find(id="modal")				
@@ -150,7 +142,5 @@ with MySQLcompatible("daniel", "123456789") as database:
 				}
 				utils.insert_into_modal_uni(db, cursor, dados_modal_uni)		
 			print("Dados inseridos na tabela 'modal_uni'\n")
-			try: 
-				browser.find_element_by_class_name("btn.btn-danger").click()
-				time.sleep(1)
+			try: WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "btn.btn-danger"))).click()
 			except Exception: pass
