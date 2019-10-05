@@ -2,14 +2,12 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from core import MySQLcompatible
 from bs4 import BeautifulSoup
+from core import MySQL
 import requests
 import re
 import datetime
-import time
 import utils
-import json
 
 headers = {
 	'sec-fetch-mode': 'cors',
@@ -26,19 +24,18 @@ headers = {
 
 options = webdriver.ChromeOptions()
 options.add_argument('headless')
-browser = webdriver.Chrome(options=options)
-browser.get("https://bets93.net/")
-browser.find_element_by_xpath("//div[@class='lateral']/div/ul").click()
-time.sleep(1)
+driver = webdriver.Chrome(options=options)
+driver.get("https://bets93.net/")
+WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@class='lateral']/div/ul"))).click()
 
 pattern_campeonato = re.compile(r"c_visivel")
 pattern_jogo = re.compile(r"j_visivel_")
 
-soup = BeautifulSoup(browser.page_source, "html.parser")
+soup = BeautifulSoup(driver.page_source, "html.parser")
 tabela_jogos = soup.find(class_="jogos")
 jogos = tabela_jogos.findAll("div",recursive=False)
 
-with MySQLcompatible("daniel", "123456789") as database:
+with MySQL("daniel", "123456789") as database:
 	db = database[0]
 	cursor = database[1]
 	utils.create_database(cursor, "bets93")
@@ -111,15 +108,15 @@ with MySQLcompatible("daniel", "123456789") as database:
 				valor.append(float(odd))
 
 			botao = "jogo_"+str(id_jogo)+"_outros"
-			try: WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.ID, botao))).click()
-			except Exception: WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "btn.btn-danger"))).click()
+			try: WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, botao))).click()
+			except Exception: WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "btn.btn-danger"))).click()
 
-			soup = BeautifulSoup(browser.page_source, "html.parser")
+			soup = BeautifulSoup(driver.page_source, "html.parser")
 			modal = soup.find(id="modal")
 			camps = modal.findAll(class_="camp")
 			props = modal.findAll(class_="col-9 col-sm-9",recursive=True)
 			while (len(set(categoria)) != len(camps)) or (len(propriedade) != len(props)):
-				soup = BeautifulSoup(browser.page_source, "html.parser")
+				soup = BeautifulSoup(driver.page_source, "html.parser")
 				modal = soup.find(id="modal")				
 				camps = modal.findAll(class_="camp")
 				props = modal.findAll(class_="col-9 col-sm-9",recursive=True)
@@ -142,5 +139,6 @@ with MySQLcompatible("daniel", "123456789") as database:
 				}
 				utils.insert_into_modal_uni(db, cursor, dados_modal_uni)		
 			print("Dados inseridos na tabela 'modal_uni'\n")
-			try: WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "btn.btn-danger"))).click()
+			try: WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "btn.btn-danger"))).click()
 			except Exception: pass
+	print("Todos os dados foram inseridos com sucesso!")

@@ -1,1 +1,1 @@
-from .MySQLcompatible import MySQLcompatible
+from .MySQL import MySQL

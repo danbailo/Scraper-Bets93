@@ -1,5 +1,4 @@
 import mysql.connector
-from mysql.connector import errorcode
 
 tabelas = {}
 
@@ -47,7 +46,7 @@ def insert_into_jogos_uni(db, cursor, jogos_uni):
 		"INSERT IGNORE INTO jogos_uni "
 		"(id, titulo, data, slugLiga, pais, liga, status, posicao) "
 		"VALUES (%(id_jogo)s, %(titulo)s, %(data_hora)s, %(slugLiga)s, %(pais)s, %(liga)s, %(status)s, %(posicao)s)"
-		)
+	)
 	cursor.execute(add_jogos_uni, jogos_uni)
 	db.commit()	
 
@@ -56,6 +55,6 @@ def insert_into_modal_uni(db, cursor, modal_uni):
 		"INSERT IGNORE INTO modal_uni "
 		"(jogo_id, odd_id, cat_id, categoria, id_modal, propriedade, valor, status) "
 		"VALUES (%(jogo_id)s, %(odd_id)s, %(cat_id)s, %(categoria)s, %(id_modal)s, %(propriedade)s, %(valor)s, %(status)s)"
-		)
+	)
 	cursor.execute(add_modal_uni, modal_uni)
 	db.commit()	
