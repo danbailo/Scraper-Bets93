@@ -3,6 +3,7 @@ import mysql.connector
 class BancoDados:
     def __init__(self, usuario, senha, nome_banco_dados):
         self.conn = mysql.connector.connect(user=usuario,passwd=senha, database=nome_banco_dados)
+        print("\nConectado ao banco de dados com sucesso!\n")
         self.cursor = self.conn.cursor()
         
     def truncate_tables(self):

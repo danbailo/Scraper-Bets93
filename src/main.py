@@ -7,8 +7,8 @@ from core import BancoDados
 import unicodedata
 import datetime
 import requests
-import re
 import sys
+import re
 
 def get_browser(url):
 	options = webdriver.ChromeOptions()
@@ -36,21 +36,19 @@ if __name__ == "__main__":
 		print("\nExemplo:")
 		print('\tpython main.py teste "" banco')
 		exit(-1)
-	bd = BancoDados(usuario=sys.argv[1], senha=sys.argv[2], nome_banco_dados=sys.argv[3])
+
+	bd = BancoDados(sys.argv[1], sys.argv[2], sys.argv[3])
 	bd.truncate_tables()	
 		
 	base_url = "https://bets93.net/"
 	driver = get_browser(base_url)
 	soup = BeautifulSoup(driver.page_source, "html.parser")
-
-
 	pattern_campeonato = re.compile(r"c_visivel")
 	pattern_jogo = re.compile(r"j_visivel_")
-
 	soup = BeautifulSoup(driver.page_source, "html.parser")
 	tabela_jogos = soup.find(class_="jogos")
+	
 	jogos = tabela_jogos.findAll("div",recursive=False)
-
 	for jogo in jogos:		
 		attr = jogo.get("id")
 		if pattern_campeonato.match(attr):
