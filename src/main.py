@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 from core import BancoDados
+import unicodedata
 import datetime
 import requests
 import re
@@ -16,6 +17,14 @@ def get_browser(url):
 	driver.get(url)
 	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@class='lateral']/div/ul"))).click()	
 	return driver
+
+def remove_acentos(string):
+	try: string = unicode(string, 'utf-8')
+	except (TypeError, NameError): pass
+	string = unicodedata.normalize('NFD', string)
+	string = string.encode('ascii', 'ignore')
+	string = string.decode("utf-8")
+	return str(string)
 
 if __name__ == "__main__":
 	if len(sys.argv) != 4:
@@ -48,9 +57,10 @@ if __name__ == "__main__":
 			NOME_CAMP = jogo.find(class_="camp").text
 			slugLiga = NOME_CAMP.lower().replace(' ','-')
 			slugLiga = re.sub(pattern=r'(^-|-$)',repl='', string=slugLiga)
-			pais = NOME_CAMP.split()[0]
+			pais = remove_acentos(NOME_CAMP.split()[0])
 			liga = NOME_CAMP.split()[1:]
-			liga = ' '.join(liga)
+			liga = remove_acentos(' '.join(liga))
+
 		elif pattern_jogo.match(attr):
 			id_jogo = int(attr.split('_')[-1])
 			titulo = jogo.find(class_="times fundojogos").text.split()[:-3]
