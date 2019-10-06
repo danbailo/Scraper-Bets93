@@ -29,14 +29,12 @@ if __name__ == "__main__":
 		print('\tpython main.py teste ""')
 		exit(-1)
 		
+	bd = BancoDados(usuario=sys.argv[1], senha=sys.argv[2], nome_banco_dados="bets93")
+	bd.truncate_tables()
+	
 	base_url = "https://bets93.net/"
 	driver = get_browser(base_url)
 	soup = BeautifulSoup(driver.page_source, "html.parser")
-
-
-	bd = BancoDados(usuario=sys.argv[1], senha=sys.argv[2], nome_banco_dados="bets93")
-	bd.truncate_tables()
-
 	pattern_campeonato = re.compile(r"c_visivel")
 	pattern_jogo = re.compile(r"j_visivel_")
 	jogos = soup.find(class_="jogos").findAll("div",recursive=False)
