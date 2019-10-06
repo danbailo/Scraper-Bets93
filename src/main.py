@@ -8,7 +8,6 @@ from core import BancoDados
 import datetime
 import requests
 import re
-import json
 
 def get_browser(url):
 	options = webdriver.ChromeOptions()
@@ -19,7 +18,8 @@ def get_browser(url):
 	return driver
 
 if __name__ == "__main__":
-	driver = get_browser("https://bets93.net/")
+	base_url = "https://bets93.net/"
+	driver = get_browser(base_url)
 	soup = BeautifulSoup(driver.page_source, "html.parser")
 
 	bd = BancoDados(usuario="daniel", senha="123456789", nome_banco_dados="bets93")
@@ -27,9 +27,7 @@ if __name__ == "__main__":
 
 	pattern_campeonato = re.compile(r"c_visivel")
 	pattern_jogo = re.compile(r"j_visivel_")
-
 	jogos = soup.find(class_="jogos").findAll("div",recursive=False)
-
 	for jogo in jogos:		
 		attr = jogo.get("id")
 		if pattern_campeonato.match(attr):
@@ -51,7 +49,7 @@ if __name__ == "__main__":
 			minutos = int(data_hora.split()[-1].split(':')[1])
 			data_hora = str(datetime.datetime(ano,mes,dia,horas,minutos))
 
-			dados_jogos_uni = {
+			bd.insert_into_jogos_uni({
 				'id_jogo':id_jogo, 
 				'titulo': titulo, 
 				'data_hora': data_hora, 
@@ -60,11 +58,10 @@ if __name__ == "__main__":
 				'liga': liga, 
 				'status': 1, 
 				'posicao': 1
-			}
-			bd.insert_into_jogos_uni(dados_jogos_uni)     		
+			})     		
 			stop = 0
 			while True:
-				response = requests.get("https://bets93.net/api.php?id_jogo="+str(id_jogo))
+				response = requests.get(base_url+"api.php?id_jogo="+str(id_jogo))
 				if response.status_code == 200:
 					try: json_response = response.json()
 					except Exception: 
@@ -92,7 +89,7 @@ if __name__ == "__main__":
 				valor.append(float(odd))
 
 			for i in range(len(categoria)):
-				dados_modal_uni = { 
+				bd.insert_into_modal_uni({ 
 					'jogo_id': id_jogo,
 					'odd_id':odd_id[i], 
 					'cat_id':categoria[i], 
@@ -101,8 +98,7 @@ if __name__ == "__main__":
 					'propriedade':dict_id_modalidade[propriedade[i]], 
 					'valor':valor[i],
 					'status':1
-				}
-				bd.insert_into_modal_uni(dados_modal_uni)		
+				})		
 			print(f'Partida "{titulo}" inserida no banco de dados com sucesso!')
 			print(f"ID:{id_jogo}\n")
 	print("Todos os dados foram inseridos com sucesso!")
