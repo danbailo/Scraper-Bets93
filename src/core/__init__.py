@@ -1,1 +1,1 @@
-from .MySQL import MySQL
+from .BancoDados import BancoDados

@@ -3,32 +3,32 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
-from time import time
-from core import MySQL
+from utils import dict_id_modalidade, dict_tipo_modalidades
+from core import BancoDados
+import datetime
 import requests
 import re
-import datetime
-import utils
+import json
 
-options = webdriver.ChromeOptions()
-options.add_argument('headless')
-driver = webdriver.Chrome(options=options)
-driver.get("https://bets93.net/")
-WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@class='lateral']/div/ul"))).click()
+def get_browser(url):
+	options = webdriver.ChromeOptions()
+	options.add_argument('headless')
+	driver = webdriver.Chrome(options=options)
+	driver.get(url)
+	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@class='lateral']/div/ul"))).click()	
+	return driver
 
-pattern_campeonato = re.compile(r"c_visivel")
-pattern_jogo = re.compile(r"j_visivel_")
+if __name__ == "__main__":
+	driver = get_browser("https://bets93.net/")
+	soup = BeautifulSoup(driver.page_source, "html.parser")
 
-soup = BeautifulSoup(driver.page_source, "html.parser")
-tabela_jogos = soup.find(class_="jogos")
-jogos = tabela_jogos.findAll("div",recursive=False)
+	bd = BancoDados(usuario="daniel", senha="123456789", nome_banco_dados="bets93")
+	bd.truncate_tables()
 
-with MySQL("daniel", "123456789") as database:
-	db = database[0]
-	cursor = database[1]
-	utils.create_database(cursor, "bets93")
-	utils.create_table(cursor)
-	utils.truncate_table(cursor)
+	pattern_campeonato = re.compile(r"c_visivel")
+	pattern_jogo = re.compile(r"j_visivel_")
+
+	jogos = soup.find(class_="jogos").findAll("div",recursive=False)
 
 	for jogo in jogos:		
 		attr = jogo.get("id")
@@ -61,17 +61,19 @@ with MySQL("daniel", "123456789") as database:
 				'status': 1, 
 				'posicao': 1
 			}
-			utils.insert_into_jogos_uni(db, cursor, dados_jogos_uni)            		
+			bd.insert_into_jogos_uni(dados_jogos_uni)     		
 			stop = 0
 			while True:
 				response = requests.get("https://bets93.net/api.php?id_jogo="+str(id_jogo))
-				if response.status_code == 200: 
-					json_response = response.json()
+				if response.status_code == 200:
+					try: json_response = response.json()
+					except Exception: 
+						stop+=1
+						continue
 					break
 				elif stop > 15:
 					assert("\nErro ao fazer as requisições, por favor, execute o programa novamente!\n")
 					exit(-1)
-				else: stop+=1
 			response.close()
 
 			valores = []  
@@ -89,39 +91,21 @@ with MySQL("daniel", "123456789") as database:
 				odd_id.append(int(id_odd))
 				valor.append(float(odd))
 
-			botao = "jogo_"+str(id_jogo)+"_outros"
-			try: WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, botao))).click()
-			except Exception: WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "btn.btn-danger"))).click()
-
-			soup = BeautifulSoup(driver.page_source, "html.parser")
-			modal = soup.find(id="modal")
-			camps = modal.findAll(class_="camp")
-			props = modal.findAll(class_="col-9 col-sm-9",recursive=True)
-			while (len(set(categoria)) != len(camps)) or (len(propriedade) != len(props)):
-				soup = BeautifulSoup(driver.page_source, "html.parser")
-				modal = soup.find(id="modal")				
-				camps = modal.findAll(class_="camp")
-				props = modal.findAll(class_="col-9 col-sm-9",recursive=True)
-
-			for i in range(len(camps)): camps[i] = camps[i].text
-			dict_categorias = dict(zip(set(categoria),camps))
-			for i in range(len(props)): props[i] = props[i].text
-			dict_propriedades = dict(zip(propriedade,props))
-
 			for i in range(len(categoria)):
 				dados_modal_uni = { 
 					'jogo_id': id_jogo,
 					'odd_id':odd_id[i], 
 					'cat_id':categoria[i], 
-					'categoria':dict_categorias[categoria[i]],
+					'categoria':dict_tipo_modalidades[categoria[i]],
 					'id_modal':propriedade[i],
-					'propriedade':dict_propriedades[propriedade[i]], 
+					'propriedade':dict_id_modalidade[propriedade[i]], 
 					'valor':valor[i],
 					'status':1
 				}
-				utils.insert_into_modal_uni(db, cursor, dados_modal_uni)		
+				bd.insert_into_modal_uni(dados_modal_uni)		
 			print(f'Partida "{titulo}" inserida no banco de dados com sucesso!')
 			print(f"ID:{id_jogo}\n")
-			try: WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "btn.btn-danger"))).click()
-			except Exception: pass
 	print("Todos os dados foram inseridos com sucesso!")
+	bd.cursor.close()
+	bd.conn.close()
+
