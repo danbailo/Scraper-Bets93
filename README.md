@@ -9,7 +9,7 @@ Este projeto consiste em coletar todos os dados do site Bets93 e armazená-los n
 * `Python 3`
 * `pip (Gerenciador de pacotes do Python)`
 * `Google Chrome Versão 77`
-* `Selenium Driver (Já disponível no arquivo .zip para Windows) -`[ Download](https://chromedriver.storage.googleapis.com/index.html?path=77.0.3865.40/)
+* `Selenium Driver`
 * `MySQL 5.7`
   
 ---
@@ -23,12 +23,16 @@ Para instalar as dependências, execute os comandos abaixo num terminal/prompt d
 * Windows
   * `python -m pip install -r requirements.txt --user`
 
-**Instalando Selenium Driver no Linux**
+### Instalando Selenium Driver no Linux
 
 * `sudo apt-get install -y unzip xvfb libxi6 libgconf-2-4`
 * Caso você não tenha o Java instalado no computador, instale-o usando o comando abaixo:
   * `sudo apt-get install default-jdk`
-
+* [Download -  chromedriver_linux64.zip](https://chromedriver.storage.googleapis.com/77.0.3865.40/chromedriver_linux64.zip)
+* `unzip chromedriver_linux64.zip`
+* `sudo mv chromedriver /usr/bin/chromedriver`
+* `sudo chown root:root /usr/bin/chromedriver`
+* `sudo chmod +x /usr/bin/chromedriver`
 ---
 ## Como usar
 
