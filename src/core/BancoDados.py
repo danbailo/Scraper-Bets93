@@ -6,7 +6,6 @@ class BancoDados:
             assert("Por favor, digite o usuário e a senha!")
         self.conn = mysql.connector.connect(user=usuario,passwd=senha)
         self.cursor = self.conn.cursor()
-        self.cursor.execute(f"CREATE DATABASE IF NOT EXISTS {nome_banco_dados}")
         self.cursor.execute(f"USE {nome_banco_dados}")
         self.cursor.execute(
             "CREATE TABLE IF NOT EXISTS `jogos_uni` ("
