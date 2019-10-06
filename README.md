@@ -39,15 +39,19 @@ Para instalar as dependências, execute os comandos abaixo num terminal/prompt d
 Para executar o programa, abra um terminal/prompt de comando aberto, siga os passos abaixo:
 * `cd src/`
   * Linux
-  * `python3 main.py NOME_DE_USUARIO SENHA`
+  * `python3 main.py NOME_DE_USUARIO SENHA NOME_BANCO_DADOS`
 
   * Windows
-  * `python main.py NOME_DE_USUARIO SENHA`
+  * `python main.py NOME_DE_USUARIO SENHA NOME_BANCO_DADOS`
 
-Onde o NOME_DE_USUARIO e a SENHA, estão relacionados ao usuário e senha do **BANCO DE DADOS**.
+Onde o NOME_DE_USUARIO e a SENHA, estão relacionados ao usuário e senha do **BANCO DE DADOS** e o NOME_BANCO_DADOS é o nome do banco de dados que o usuário irá se conectar.
 
 *Exemplo*
 
-`python main.py teste 1234`
+* `python main.py teste 1234 NOME_BANCO_DADOS`
+
+* Exemplo caso o usuário do banco de dados não possue senha.
+  * `python main.py teste "" NOME_BANCO_DADOS`
+ 
 
 ---
