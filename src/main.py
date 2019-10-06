@@ -20,10 +20,13 @@ def get_browser(url):
 
 if __name__ == "__main__":
 	if len(sys.argv) != 3:
-		print("Para executar o programa, digite o usuário e senha do banco de dados na linha de comando!")
+		print("\nPara executar o programa, digite o usuário e senha do banco de dados na linha de comando!")
 		print("\npython main.py USUARIO SENHA")
 		print("\nExemplo:")
 		print("\tpython main.py teste 1234")
+		print('\nPara usuário que não tem senha, deve-se colocar ""')
+		print("\nExemplo:")
+		print('\tpython main.py teste ""')
 		exit(-1)
 		
 	base_url = "https://bets93.net/"
