@@ -1,40 +1,10 @@
 import mysql.connector
 
 class BancoDados:
-    def __init__(self, usuario=None, senha=None, nome_banco_dados="bets93"):
-        if usuario is None or senha is None: 
-            assert("Por favor, digite o usuário e a senha!")
-        self.conn = mysql.connector.connect(user=usuario,passwd=senha)
+    def __init__(self, usuario, senha, nome_banco_dados):
+        self.conn = mysql.connector.connect(user=usuario,passwd=senha, database=nome_banco_dados)
         self.cursor = self.conn.cursor()
-        self.cursor.execute(f"USE {nome_banco_dados}")
-        self.cursor.execute(
-            "CREATE TABLE IF NOT EXISTS `jogos_uni` ("
-            "  `id` int(11) NOT NULL,"
-            "  `titulo` varchar(250) NOT NULL,"
-            "  `data` datetime NOT NULL,"
-            "  `slugLiga` varchar(120) DEFAULT NULL,"
-            "  `pais` varchar(100) DEFAULT NULL,"
-            "  `liga` varchar(100) DEFAULT NULL,"
-            "  `status` int(11) NOT NULL,"
-            "  `posicao` int(11) NOT NULL,"
-            "   PRIMARY KEY(`id`)"    
-            ") ENGINE=MyISAM DEFAULT CHARSET=latin1;"
-        )
-        self.cursor.execute(
-            "CREATE TABLE IF NOT EXISTS `modal_uni` ("
-            "  `id` int(11) NOT NULL AUTO_INCREMENT,"
-            "  `jogo_id` int(11) NOT NULL,"
-            "  `odd_id` int(11) NOT NULL,"
-            "  `cat_id` int(11) NOT NULL,"
-            "  `categoria` varchar(250) NOT NULL,"
-            "  `id_modal` int(11) NOT NULL,"    
-            "  `propriedade` varchar(250) NOT NULL,"
-            "  `valor` decimal(8,2) NOT NULL DEFAULT '0.00',"
-            "  `status` int(11) NOT NULL,"
-            "   PRIMARY KEY (`id`)"    
-            ") ENGINE=MyISAM DEFAULT CHARSET=latin1;"
-        )
-
+        
     def truncate_tables(self):
         self.cursor.execute("TRUNCATE TABLE jogos_uni")
         self.cursor.execute("TRUNCATE TABLE modal_uni")

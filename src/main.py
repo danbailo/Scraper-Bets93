@@ -18,22 +18,22 @@ def get_browser(url):
 	return driver
 
 if __name__ == "__main__":
-	if len(sys.argv) != 3:
-		print("\nPara executar o programa, digite o usuário e senha do banco de dados na linha de comando!")
-		print("\npython main.py USUARIO SENHA")
+	if len(sys.argv) != 4:
+		print("\nPara executar o programa, digite o usuário, senha e o nome do banco de dados na linha de comando!")
+		print("\npython main.py USUARIO SENHA NOME_BANCO_DADOS")
 		print("\nExemplo:")
-		print("\tpython main.py teste 1234")
+		print("\tpython main.py teste 1234 banco")
 		print('\nPara usuário que não tem senha, deve-se colocar ""')
 		print("\nExemplo:")
-		print('\tpython main.py teste ""')
+		print('\tpython main.py teste "" banco')
 		exit(-1)
+	bd = BancoDados(usuario=sys.argv[1], senha=sys.argv[2], nome_banco_dados=sys.argv[3])
+	bd.truncate_tables()	
 		
 	base_url = "https://bets93.net/"
 	driver = get_browser(base_url)
 	soup = BeautifulSoup(driver.page_source, "html.parser")
 
-	bd = BancoDados(usuario=sys.argv[1], senha=sys.argv[2], nome_banco_dados="bets93")
-	bd.truncate_tables()	
 
 	pattern_campeonato = re.compile(r"c_visivel")
 	pattern_jogo = re.compile(r"j_visivel_")
@@ -136,3 +136,4 @@ if __name__ == "__main__":
 			try: WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "btn.btn-danger"))).click()
 			except Exception: pass
 	print("Todos os dados foram inseridos com sucesso!")
+	bd.conn.close()
