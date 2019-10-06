@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 from core import BancoDados
+from platform import system
 import unicodedata
 import datetime
 import requests
@@ -12,8 +13,16 @@ import re
 
 def get_browser(url):
 	options = webdriver.ChromeOptions()
+	if system() == 'Linux': 
+		options.binary_location = "/usr/bin/google-chrome"
+		executable_path=r'/usr/bin/chromedriver'
+	elif system() == 'Windows': 
+		executable_path=r'./chromedriver.exe'
+	options.binary_location = "/usr/bin/google-chrome"
 	options.add_argument('headless')
-	driver = webdriver.Chrome(options=options)
+	options.add_argument('no-sandbox')
+	options.add_argument('disable-dev-shm-usage')
+	driver = webdriver.Chrome(options=options, executable_path=executable_path)
 	driver.get(url)
 	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@class='lateral']/div/ul"))).click()	
 	return driver
