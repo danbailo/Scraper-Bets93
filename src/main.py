@@ -8,6 +8,7 @@ from core import BancoDados
 import datetime
 import requests
 import re
+import sys
 
 def get_browser(url):
 	options = webdriver.ChromeOptions()
@@ -18,11 +19,19 @@ def get_browser(url):
 	return driver
 
 if __name__ == "__main__":
+	if len(sys.argv) != 3:
+		print("Para executar o programa, digite o usuário e senha do banco de dados na linha de comando!")
+		print("\npython main.py USUARIO SENHA")
+		print("\nExemplo:")
+		print("\tpython main.py teste 1234")
+		exit(-1)
+		
 	base_url = "https://bets93.net/"
 	driver = get_browser(base_url)
 	soup = BeautifulSoup(driver.page_source, "html.parser")
 
-	bd = BancoDados(usuario="daniel", senha="123456789", nome_banco_dados="bets93")
+
+	bd = BancoDados(usuario=sys.argv[1], senha=sys.argv[2], nome_banco_dados="bets93")
 	bd.truncate_tables()
 
 	pattern_campeonato = re.compile(r"c_visivel")
