@@ -13,16 +13,10 @@ import re
 
 def get_browser(url):
 	options = webdriver.ChromeOptions()
-	if system() == 'Linux': 
-		options.binary_location = "/usr/bin/google-chrome"
-		executable_path=r'/usr/bin/chromedriver'
-	elif system() == 'Windows': 
-		executable_path=r'./chromedriver.exe'
-	options.binary_location = "/usr/bin/google-chrome"
 	options.add_argument('headless')
 	options.add_argument('no-sandbox')
 	options.add_argument('disable-dev-shm-usage')
-	driver = webdriver.Chrome(options=options, executable_path=executable_path)
+	driver = webdriver.Chrome(options=options)
 	driver.get(url)
 	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//div[@class='lateral']/div/ul"))).click()	
 	return driver
@@ -36,7 +30,7 @@ def remove_acentos(string):
 	return str(string)
 
 if __name__ == "__main__":
-	if len(sys.argv) != 4:
+	if len(sys.argv) != 3:
 		print("\nPara executar o programa, digite o usuário, senha e o nome do banco de dados na linha de comando!")
 		print("\npython main.py USUARIO SENHA NOME_BANCO_DADOS")
 		print("\nExemplo:")
@@ -46,7 +40,7 @@ if __name__ == "__main__":
 		print('\tpython main.py teste "" banco')
 		exit(-1)
 
-	bd = BancoDados(sys.argv[1], sys.argv[2], sys.argv[3])
+	bd = BancoDados(sys.argv[1], sys.argv[2])
 	bd.truncate_tables()	
 		
 	base_url = "https://bets93.net/"
@@ -154,3 +148,4 @@ if __name__ == "__main__":
 			except Exception: pass
 	print("Todos os dados foram inseridos com sucesso!")
 	bd.conn.close()
+	driver.quit()
