@@ -87,13 +87,14 @@ if __name__ == "__main__":
 			stop = 0
 			while True:
 				response = requests.get("https://bets93.net/api.php?id_jogo="+str(id_jogo))
-				if response.status_code == 200: 
+				try:
 					json_response = response.json()
 					break
-				elif stop > 15:
-					assert("\nErro ao fazer as requisições, por favor, execute o programa novamente!\n")
-					exit(-1)
-				else: stop+=1
+				except Exception:
+					stop+=1
+					if stop > 15:
+						assert("\nErro ao fazer as requisições, por favor, execute o programa novamente!\n")
+						exit(-1)
 			response.close()
 
 			valores = []  
